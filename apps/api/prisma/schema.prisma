@@ -10,12 +10,66 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Sample {
-  id        Int      @id @default(autoincrement())
-  name      String
-  code      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// model Sample {
+//   id        Int      @id @default(autoincrement())
+//   name      String
+//   code      String   @unique
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
 
-  @@map("samples") // if you want to use snake_case format
+//   @@map("samples") // if you want to use snake_case format
+// }
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  username     String   @unique
+  password     String
+  referralCode String   @unique
+  profile      Profile?
+  roleId       Int
+  role         Role     @relation(fields: [roleId], references: [id])
+  referrerId   Int?
+  referrer     User?    @relation(name: "referred_by", fields: [referrerId], references: [id])
+  referee      User[]   @relation(name: "referred_by")
+  points       Point[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+}
+
+model Role {
+  id   Int    @id @default(autoincrement())
+  name String
+  user User[]
+}
+
+model Profile {
+  id         Int       @id @default(autoincrement())
+  firstname  String?
+  lastname   String?
+  birthDate  DateTime?
+  phone      String?
+  gender     Gender?
+  customerId Int       @unique
+  customer   User      @relation(fields: [customerId], references: [id])
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @default(now()) @updatedAt
+}
+
+enum Gender {
+  FEMALE
+  MALE
+  NON_BINARY
+  PREFER_NOT_TO_SAY
+}
+
+model Point {
+  id              Int      @id @default(autoincrement())
+  pointsEarned    Int
+  pointsRemaining Int
+  pointsExpiry    DateTime
+  pointsOwnerId   Int
+  pointsOwner     User     @relation(fields: [pointsOwnerId], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
 }
