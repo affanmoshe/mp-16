@@ -106,3 +106,23 @@ export const validateUserUpdate = [
     next();
   },
 ];
+
+// IMPORTANT: for reset password only!
+export const validateResetPassword = [
+  body('password')
+    .trim()
+    .notEmpty()
+    .withMessage('Password is required')
+    .isLength({ min: 8 })
+    .withMessage('Password must be at least 8 characters long'),
+
+  (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).send({ errors: errors.array() });
+    }
+
+    next();
+  },
+];
