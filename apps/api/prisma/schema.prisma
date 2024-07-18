@@ -21,20 +21,23 @@ datasource db {
 // }
 
 model User {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique
-  username     String   @unique
-  password     String
-  referralCode String   @unique
-  profile      Profile?
-  roleId       Int
-  role         Role     @relation(fields: [roleId], references: [id])
-  referrerId   Int?
-  referrer     User?    @relation(name: "referred_by", fields: [referrerId], references: [id])
-  referee      User[]   @relation(name: "referred_by")
-  points       Point[]
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @default(now()) @updatedAt
+  id               Int       @id @default(autoincrement())
+  email            String    @unique
+  username         String    @unique
+  password         String
+  referralCode     String    @unique
+  profile          Profile?
+  roleId           Int
+  role             Role      @relation(fields: [roleId], references: [id])
+  referrerId       Int?
+  referrer         User?     @relation(name: "referred_by", fields: [referrerId], references: [id])
+  referee          User[]    @relation(name: "referred_by")
+  points           Point[]
+  isVerified       Boolean   @default(false)
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @default(now()) @updatedAt
 }
 
 model Role {
@@ -50,6 +53,7 @@ model Profile {
   birthDate  DateTime?
   phone      String?
   gender     Gender?
+  avatar     String?
   customerId Int       @unique
   customer   User      @relation(fields: [customerId], references: [id])
   createdAt  DateTime  @default(now())
