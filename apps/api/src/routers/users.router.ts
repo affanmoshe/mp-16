@@ -5,6 +5,7 @@ import {
   validateUserUpdate,
 } from '@/middlewares/users.validator';
 import { AuthMiddleware } from '@/middlewares/auth.middleware';
+import { uploader } from '@/libs/uploader';
 
 export class UsersRouter {
   private router: Router;
@@ -19,28 +20,21 @@ export class UsersRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.post(
-      '/register',
-      validateUserRegister,
-      this.usersController.createUserController,
-    );
-
-    this.router.post('/login', this.usersController.loginController);
-
+    // for getting user profile, passing { id } from jwt then return user data
     this.router.get(
       '/profile',
       this.guard.verifyToken,
       this.usersController.profileController,
     );
 
+    // for updating user profile, passing { id } from jwt and data in body then return user data
     this.router.patch(
       '/update-profile',
       validateUserUpdate,
       this.guard.verifyToken,
+      uploader('avatar', '/avatar').single('file'),
       this.usersController.updateUserController,
     );
-
-    this.router.post('/test', this.usersController.testFindUser);
   }
 
   getRouter(): Router {
