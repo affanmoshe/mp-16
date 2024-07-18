@@ -8,8 +8,11 @@ import express, {
   Router,
 } from 'express';
 import cors from 'cors';
-import { PORT } from './config';
+import { FRONTEND_URL, PORT } from './config';
+import { AuthRouter } from './routers/auth.router';
 import { UsersRouter } from './routers/users.router';
+import { PasswordRouter } from './routers/password.router';
+import { OrganizersRouter } from './routers/organizers.router';
 // import { SampleRouter } from './routers/sample.router';
 
 export default class App {
@@ -23,7 +26,12 @@ export default class App {
   }
 
   private configure(): void {
-    this.app.use(cors());
+    this.app.use(
+      cors({
+        origin: FRONTEND_URL,
+        credentials: true,
+      }),
+    );
     this.app.use(json());
     this.app.use(urlencoded({ extended: true }));
   }
@@ -53,7 +61,10 @@ export default class App {
 
   private routes(): void {
     // const sampleRouter = new SampleRouter();
+    const authRouter = new AuthRouter();
     const usersRouter = new UsersRouter();
+    const passwordRouter = new PasswordRouter();
+    const organizersRouter = new OrganizersRouter();
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
@@ -61,7 +72,10 @@ export default class App {
 
     // this.app.use('/api/samples', sampleRouter.getRouter());
 
+    this.app.use('/api/auth', authRouter.getRouter());
     this.app.use('/api/users', usersRouter.getRouter());
+    this.app.use('/api/password', passwordRouter.getRouter());
+    this.app.use('/api/organizers', organizersRouter.getRouter());
   }
 
   public start(): void {
