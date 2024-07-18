@@ -3,6 +3,8 @@ export type User = {
   email: string;
   username: string;
   role: string;
+  avatar?: string;
+  isVerified: boolean;
 };
 
 declare global {
