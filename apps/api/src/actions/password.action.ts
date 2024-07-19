@@ -1,4 +1,7 @@
 import { genSalt, hash } from 'bcrypt';
+import fs from 'fs';
+import * as handlebars from 'handlebars';
+import path from 'path';
 import prisma from '../prisma';
 import { FRONTEND_URL, NODEMAILER_EMAIL } from '../config';
 import usersAction from './users.action';
@@ -22,7 +25,22 @@ export class PasswordAction {
       const NOW = new Date();
       const resetTokenExpiry = NOW.setHours(NOW.getHours() + 1);
 
+      // nodemailer configuration
       const resetLink = `${FRONTEND_URL}/reset-password?token=${resetToken}`;
+
+      const templatePath = path.join(
+        __dirname,
+        '../templates',
+        'resetPassword.hbs',
+      );
+      const templateSource = fs.readFileSync(templatePath, 'utf-8');
+
+      const compiledTemplate = handlebars.compile(templateSource);
+
+      const html = compiledTemplate({
+        action_url: resetLink,
+        support_url: 'https://example.com',
+      });
 
       //   updating resetToken & resetTokenExpiry to db then send email to user (atomic)
       await prisma.$transaction(async (tx) => {
@@ -39,8 +57,8 @@ export class PasswordAction {
         await transporter.sendMail({
           from: NODEMAILER_EMAIL,
           to: email,
-          subject: 'Password Reset',
-          html: `<p>Please click <a href="${resetLink}">here</a> to change your password.</p>`,
+          subject: 'Password Reset Request',
+          html,
         });
       });
 

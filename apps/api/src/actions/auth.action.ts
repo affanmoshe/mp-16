@@ -1,4 +1,7 @@
 import { compare, genSalt, hash } from 'bcrypt';
+import fs from 'fs';
+import * as handlebars from 'handlebars';
+import path from 'path';
 import prisma from '../prisma';
 import { sign, verify } from 'jsonwebtoken';
 import {
@@ -265,17 +268,36 @@ class AuthAction {
 
   public sendVerifyEmail = async (email: string) => {
     try {
-      const token = sign({ email }, String(EMAIL_VERIFICATION_SECRET), {
-        expiresIn: '1hr',
-      });
+      const verifyEmailToken = sign(
+        { email },
+        String(EMAIL_VERIFICATION_SECRET),
+        {
+          expiresIn: '1hr',
+        },
+      );
 
-      const verificationLink = `${FRONTEND_URL}/verify-email?token=${token}`;
+      // nodemailer configuration
+      const verificationLink = `${FRONTEND_URL}/verify-email?token=${verifyEmailToken}`;
+
+      const templatePath = path.join(
+        __dirname,
+        '../templates',
+        'emailVerification.hbs',
+      );
+      const templateSource = fs.readFileSync(templatePath, 'utf-8');
+
+      const compiledTemplate = handlebars.compile(templateSource);
+
+      const html = compiledTemplate({
+        action_url: verificationLink,
+        support_url: 'https://example.com',
+      });
 
       await transporter.sendMail({
         from: NODEMAILER_EMAIL,
         to: email,
-        subject: 'Email Verification',
-        html: `<p>Please click <a href="${verificationLink}">here</a> to verify your email address.</p>`,
+        subject: 'Confirm Your Email Address',
+        html,
       });
     } catch (error) {
       throw error;
