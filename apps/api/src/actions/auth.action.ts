@@ -9,6 +9,7 @@ import {
   EMAIL_VERIFICATION_SECRET,
   FRONTEND_URL,
   NODEMAILER_EMAIL,
+  REFRESH_TOKEN_SECRET,
 } from '../config';
 import usersAction from './users.action';
 import { transporter } from '@/libs/nodemailer';
@@ -46,8 +47,8 @@ class AuthAction {
         referrerId = referralCheck;
       }
 
-      // transaction function to ensure atomicity: check referrer code, record user, and record point if referrer code is valid then return created user
-      await prisma.$transaction(async (tx) => {
+      // transaction function to ensure atomicity: check referrer code, record user, and record point if referrer code is valid, logging in, then return { accessToken, refreshToken }
+      const result = await prisma.$transaction(async (tx) => {
         await tx.user.create({
           data: {
             username,
@@ -93,17 +94,12 @@ class AuthAction {
 
         await this.sendVerifyEmail(email);
 
-        // return user;
+        const login = this.login(email, password);
+
+        return login;
       });
 
-      // const payload = {
-      //   username: result.username,
-      //   email: result.email,
-      //   referralCode: result.referralCode,
-      //   role: result.role.name,
-      // };
-
-      // return payload;
+      return result;
     } catch (error) {
       throw error;
     }
@@ -164,7 +160,7 @@ class AuthAction {
     }
   }
 
-  // login action consume email & password then return jwt token
+  // login action consume email & password then return { accessToken, refreshToken }
   public login = async (email: string, password: string) => {
     try {
       // check whether the email has been registered then return the user data
@@ -199,7 +195,7 @@ class AuthAction {
 
       if (!isValid) throw new Error('Password is incorrect');
 
-      const payload = {
+      const accessPayload = {
         id: user.id,
         email: user.email,
         username: user.username,
@@ -208,18 +204,26 @@ class AuthAction {
         avatar: user.profile?.avatar,
       };
 
-      const token = sign(payload, String(ACCESS_TOKEN_SECRET), {
+      const refreshPayload = {
+        email: user.email,
+      };
+
+      const accessToken = sign(accessPayload, String(ACCESS_TOKEN_SECRET), {
+        expiresIn: '30m',
+      });
+
+      const refreshToken = sign(refreshPayload, String(REFRESH_TOKEN_SECRET), {
         expiresIn: '24hr',
       });
 
-      return token;
+      return { accessToken, refreshToken };
     } catch (error) {
       throw error;
     }
   };
 
-  // refresh token action, consume id from jwt then return refreshed jwt token
-  public refreshToken = async (id: number) => {
+  // refresh token action, consume id from jwt then return refreshed { accessToken }
+  public refreshToken = async (email: string) => {
     try {
       // find user by its id from jwt
       const user = await prisma.user.findUnique({
@@ -240,7 +244,7 @@ class AuthAction {
           },
         },
         where: {
-          id,
+          email,
         },
       });
 
@@ -256,11 +260,11 @@ class AuthAction {
         avatar: user.profile?.avatar,
       };
 
-      const token = sign(payload, String(ACCESS_TOKEN_SECRET), {
-        expiresIn: '24hr',
+      const accessToken = sign(payload, String(ACCESS_TOKEN_SECRET), {
+        expiresIn: '30m',
       });
 
-      return token;
+      return { accessToken };
     } catch (error) {
       throw error;
     }

@@ -27,10 +27,10 @@ export class AuthRouter {
     // for user login, passing { email, password } then return void. send response: access-token and refresh-token cookies
     this.router.post('/login', this.authController.loginController);
 
-    // for refresh user token, passing { id } from jwt then return void. send response: access-token and refresh-token cookies
+    // for refresh user token, passing { email } from refresh-token (jwt) then return void. send response: access-token cookies
     this.router.get(
       '/refresh-token',
-      this.guard.verifyToken,
+      this.guard.verifyRefreshToken,
       this.authController.refreshTokenController,
     );
 

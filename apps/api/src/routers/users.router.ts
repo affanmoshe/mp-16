@@ -23,7 +23,7 @@ export class UsersRouter {
     // for getting user profile, passing { id } from jwt then return user data
     this.router.get(
       '/profile',
-      this.guard.verifyToken,
+      this.guard.verifyAccessToken,
       this.usersController.profileController,
     );
 
@@ -31,7 +31,7 @@ export class UsersRouter {
     this.router.patch(
       '/update-profile',
       validateUserUpdate,
-      this.guard.verifyToken,
+      this.guard.verifyAccessToken,
       uploader('avatar', '/avatar').single('file'),
       this.usersController.updateUserController,
     );
