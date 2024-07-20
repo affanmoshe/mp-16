@@ -1,22 +1,48 @@
 import { Request, Response, NextFunction } from 'express';
 import { verify } from 'jsonwebtoken';
 import { User } from '../types/express';
-import { ACCESS_TOKEN_SECRET, EMAIL_VERIFICATION_SECRET } from '../config';
+import {
+  ACCESS_TOKEN_SECRET,
+  EMAIL_VERIFICATION_SECRET,
+  REFRESH_TOKEN_SECRET,
+} from '../config';
 
 export class AuthMiddleware {
   // for verifying if the request coming from authenticated user whatever the role
   // token is passed from header
-  public verifyToken = async (
+  public verifyAccessToken = async (
     req: Request,
     res: Response,
     next: NextFunction,
   ) => {
     try {
-      const token = req.header('Authorization')?.replace('Bearer ', '');
+      const accessToken = req.header('Authorization')?.replace('Bearer ', '');
 
-      if (!token) throw new Error('Token is missing');
+      if (!accessToken) throw new Error('Token is missing');
 
-      const isToken = verify(token, String(ACCESS_TOKEN_SECRET));
+      const isToken = verify(accessToken, String(ACCESS_TOKEN_SECRET));
+
+      if (!isToken) throw new Error('Unauthorized');
+
+      req.user = isToken as User;
+
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public verifyRefreshToken = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const refreshToken = req.header('Authorization')?.replace('Bearer ', '');
+
+      if (!refreshToken) throw new Error('Token is missing');
+
+      const isToken = verify(refreshToken, String(REFRESH_TOKEN_SECRET));
 
       if (!isToken) throw new Error('Unauthorized');
 

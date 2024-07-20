@@ -23,6 +23,7 @@ export class AuthController {
     }
   };
 
+  // return void
   public createUserController = async (
     req: Request,
     res: Response,
@@ -31,7 +32,7 @@ export class AuthController {
     try {
       const { username, email, password, referrerCode, roleId } = req.body;
 
-      await authAction.createUser(
+      const result = await authAction.createUser(
         username,
         email,
         password,
@@ -39,12 +40,11 @@ export class AuthController {
         roleId,
       );
 
-      const userLogin = await authAction.login(email, password);
-
-      res.status(201).json({
-        message: 'Create user success',
-        data: userLogin,
-      });
+      res
+        .status(201)
+        .cookie('access-token', result.accessToken)
+        .cookie('refresh-token', result.refreshToken)
+        .json({ message: 'Create user success', result });
     } catch (error) {
       next(error);
     }
@@ -58,13 +58,13 @@ export class AuthController {
     try {
       const { email, password } = req.body;
 
-      const user = await authAction.login(email, password);
+      const result = await authAction.login(email, password);
 
       res
         .status(200)
-        .cookie('access-token', user)
-        .cookie('refresh-token', user)
-        .json({ message: 'Login success', user });
+        .cookie('access-token', result.accessToken)
+        .cookie('refresh-token', result.refreshToken)
+        .json({ message: 'Login success', result });
     } catch (error) {
       next(error);
     }
@@ -76,14 +76,13 @@ export class AuthController {
     next: NextFunction,
   ) => {
     try {
-      const { id } = req.user as User;
+      const { email } = req.user as User;
 
-      const result = await authAction.refreshToken(id);
+      const result = await authAction.refreshToken(email);
 
       res
         .status(200)
-        .cookie('access-token', result)
-        .cookie('refresh-token', result)
+        .cookie('access-token', result.accessToken)
         .json({ message: 'Refresh token success', result });
     } catch (error) {
       next(error);
