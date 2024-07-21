@@ -93,13 +93,11 @@ class AuthAction {
         }
 
         await this.sendVerifyEmail(email);
-
-        const login = this.login(email, password);
-
-        return login;
       });
 
-      return result;
+      const login = await this.login(email, password);
+
+      return login;
     } catch (error) {
       throw error;
     }
@@ -281,7 +279,7 @@ class AuthAction {
       );
 
       // nodemailer configuration
-      const verificationLink = `${FRONTEND_URL}/verify-email?token=${verifyEmailToken}`;
+      const verificationLink = `${FRONTEND_URL}/verifikasi?token=${verifyEmailToken}`;
 
       const templatePath = path.join(
         __dirname,
