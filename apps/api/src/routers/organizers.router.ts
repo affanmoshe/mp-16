@@ -28,7 +28,7 @@ export class OrganizersRouter {
 
     this.router.get(
       '/test',
-      this.guard.verifyToken,
+      this.guard.verifyAccessToken,
       this.guard.verifyRole('ORGANIZER'),
       this.authController.testFindUser,
     );

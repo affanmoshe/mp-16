@@ -3,6 +3,10 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import StoreProvider from '@/components/providers/StoreProvider';
+import { Toaster } from '@/components/ui/toaster';
+import FirstLoading from '@/components/FirstLoading';
+import { getCookie } from 'cookies-next';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -19,9 +23,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Header />
-        {children}
-        <Footer />
+        {/* <Header /> */}
+        <StoreProvider>{children}</StoreProvider>
+        <Toaster />
+        {/* <Footer /> */}
       </body>
     </html>
   );
