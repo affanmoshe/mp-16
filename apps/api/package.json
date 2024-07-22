@@ -11,7 +11,10 @@
     "db:generate": "dotenv -e .env.development -- npx prisma generate",
     "db:pull": "dotenv -e .env.development -- npx prisma db pull",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prisma": "npx prisma"
+    "prisma": "npx prisma",
+    "db:migrate": "dotenv -e .env.development -- npx prisma migrate dev",
+    "db:generate": "dotenv -e .env.development -- npx prisma generate",
+    "db:pull": "dotenv -e .env.development -- npx prisma db pull"
   },
   "author": "",
   "license": "ISC",
