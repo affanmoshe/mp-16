@@ -87,6 +87,7 @@ enum paymentStatus {
   pending
   failed
   cancelled
+}
 
 model User {
   id               Int       @id @default(autoincrement())
