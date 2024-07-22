@@ -9,7 +9,11 @@ import express, {
 } from 'express';
 import cors from 'cors';
 import { PORT } from './config';
-import { SampleRouter } from './routers/sample.router';
+import { EventsRouter } from './routers/events.router';
+import { ReviewRouter } from './routers/reviews.router';
+import { TicketRouter } from './routers/tickets.router';
+import { TransactionRouter } from './routers/transactions.router';
+import { PromotionRouter } from './routers/promotions.router';
 
 export default class App {
   private app: Express;
@@ -31,7 +35,7 @@ export default class App {
     // not found
     this.app.use((req: Request, res: Response, next: NextFunction) => {
       if (req.path.includes('/api/')) {
-        res.status(404).send('Not found !');
+        res.status(404).send('Not founds!');
       } else {
         next();
       }
@@ -41,8 +45,8 @@ export default class App {
     this.app.use(
       (err: Error, req: Request, res: Response, next: NextFunction) => {
         if (req.path.includes('/api/')) {
-          console.error('Error : ', err.stack);
-          res.status(500).send('Error !');
+          console.error('Error: ', err.stack);
+          res.status(500).send('Error!');
         } else {
           next();
         }
@@ -51,13 +55,21 @@ export default class App {
   }
 
   private routes(): void {
-    const sampleRouter = new SampleRouter();
+    const eventsRouter = new EventsRouter();
+    const reviewsRouter = new ReviewRouter();
+    const ticketsRouter = new TicketRouter();
+    const transactionsRouter = new TransactionRouter();
+    const promotionsRouter = new PromotionRouter();
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
     });
 
-    this.app.use('/api/samples', sampleRouter.getRouter());
+    this.app.use('/api/events', eventsRouter.getRouter());
+    this.app.use('/api/reviews', reviewsRouter.getRouter());
+    this.app.use('/api/tickets', ticketsRouter.getRouter());
+    this.app.use('/api/transactions', transactionsRouter.getRouter());
+    this.app.use('/api/promotions', promotionsRouter.getRouter());
   }
 
   public start(): void {
