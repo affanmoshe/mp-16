@@ -48,8 +48,8 @@ class AuthAction {
       }
 
       // transaction function to ensure atomicity: check referrer code, record user, and record point if referrer code is valid, logging in, then return { accessToken, refreshToken }
-      const result = await prisma.$transaction(async (tx) => {
-        await tx.user.create({
+      await prisma.$transaction(async (tx) => {
+        const user = await tx.user.create({
           data: {
             username,
             email,
@@ -62,6 +62,7 @@ class AuthAction {
             },
           },
           select: {
+            id: true,
             username: true,
             email: true,
             referralCode: true,
@@ -88,6 +89,14 @@ class AuthAction {
               pointsRemaining: POINTS_EARNED,
               pointsExpiry: new Date(EXPIRY_DATE),
               pointsOwnerId: referrerId,
+            },
+          });
+
+          await tx.discount.create({
+            data: {
+              discountRate: 0.1,
+              discountExpiry: new Date(EXPIRY_DATE),
+              customerId: user.id,
             },
           });
         }

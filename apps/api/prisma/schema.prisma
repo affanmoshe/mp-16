@@ -20,7 +20,6 @@ datasource db {
 //   @@map("samples") // if you want to use snake_case format
 // }
 
-
 model Event {
   id             Int      @id @default(autoincrement())
   organizerId    Int
@@ -102,6 +101,7 @@ model User {
   referrer         User?     @relation(name: "referred_by", fields: [referrerId], references: [id])
   referee          User[]    @relation(name: "referred_by")
   points           Point[]
+  discount         Discount?
   isVerified       Boolean   @default(false)
   resetToken       String?
   resetTokenExpiry DateTime?
@@ -145,4 +145,12 @@ model Point {
   pointsOwner     User     @relation(fields: [pointsOwnerId], references: [id])
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now()) @updatedAt
+}
+
+model Discount {
+  id             Int      @id @default(autoincrement())
+  discountRate   Float
+  discountExpiry DateTime
+  customerId     Int      @unique
+  customer       User     @relation(fields: [customerId], references: [id])
 }
