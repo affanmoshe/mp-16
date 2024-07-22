@@ -19,8 +19,9 @@ import { AuthRouter } from './routers/auth.router';
 import { UsersRouter } from './routers/users.router';
 import { PasswordRouter } from './routers/password.router';
 import { OrganizersRouter } from './routers/organizers.router';
+import { PointsRouter } from './routers/points.router';
+import { DiscountsRouter } from './routers/discounts.router';
 // import { SampleRouter } from './routers/sample.router';
-
 
 export default class App {
   private app: Express;
@@ -75,6 +76,8 @@ export default class App {
     const authRouter = new AuthRouter();
     const usersRouter = new UsersRouter();
     const passwordRouter = new PasswordRouter();
+    const pointsRouter = new PointsRouter();
+    const discountsRouter = new DiscountsRouter();
     const organizersRouter = new OrganizersRouter();
 
     this.app.get('/api', (req: Request, res: Response) => {
@@ -89,6 +92,8 @@ export default class App {
     this.app.use('/api/auth', authRouter.getRouter());
     this.app.use('/api/users', usersRouter.getRouter());
     this.app.use('/api/password', passwordRouter.getRouter());
+    this.app.use('/api/points', pointsRouter.getRouter());
+    this.app.use('/api/discounts', discountsRouter.getRouter());
     this.app.use('/api/organizers', organizersRouter.getRouter());
   }
 
