@@ -20,6 +20,74 @@ datasource db {
 //   @@map("samples") // if you want to use snake_case format
 // }
 
+
+model Event {
+  id             Int      @id @default(autoincrement())
+  organizerId    Int
+  name           String
+  description    String?
+  location       String
+  date           DateTime
+  time           DateTime
+  ticketType     String
+  price          Int      @default(0)
+  availableSeats Int
+  promotion      Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Review {
+  id         Int      @id @default(autoincrement())
+  customerId Int
+  eventId    Int
+  rating     Int
+  reviewText String
+  createdAt  DateTime @default(now())
+}
+
+model Ticket {
+  id            Int      @id @default(autoincrement())
+  eventId       Int
+  customerId    Int
+  transactionId Int
+  price         Int
+  status        Int
+  createdAt     DateTime @default(now())
+}
+
+model Transaction {
+  id            Int      @id @default(autoincrement())
+  customerId    Int
+  eventId       Int
+  totalAmount   Int
+  promotionsId  Int
+  paymentStatus String
+  createdAt     DateTime @default(now())
+}
+
+model Promotion {
+  id             Int      @id @default(autoincrement())
+  eventId        Int
+  code           String   @unique
+  discountAmount Int
+  usageLimit     Int
+  validFrom      DateTime
+  validTo        DateTime
+  createdAt      DateTime @default(now())
+}
+
+enum ticketType {
+  paid
+  free
+}
+
+enum paymentStatus {
+  paid
+  pending
+  failed
+  cancelled
+
 model User {
   id               Int       @id @default(autoincrement())
   email            String    @unique
