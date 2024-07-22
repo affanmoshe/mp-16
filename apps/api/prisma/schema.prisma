@@ -20,6 +20,7 @@ datasource db {
 //   @@map("samples") // if you want to use snake_case format
 // }
 
+
 model Event {
   id             Int      @id @default(autoincrement())
   organizerId    Int
@@ -86,4 +87,61 @@ enum paymentStatus {
   pending
   failed
   cancelled
+
+model User {
+  id               Int       @id @default(autoincrement())
+  email            String    @unique
+  username         String    @unique
+  password         String
+  referralCode     String    @unique
+  profile          Profile?
+  roleId           Int
+  role             Role      @relation(fields: [roleId], references: [id])
+  referrerId       Int?
+  referrer         User?     @relation(name: "referred_by", fields: [referrerId], references: [id])
+  referee          User[]    @relation(name: "referred_by")
+  points           Point[]
+  isVerified       Boolean   @default(false)
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @default(now()) @updatedAt
+}
+
+model Role {
+  id   Int    @id @default(autoincrement())
+  name String
+  user User[]
+}
+
+model Profile {
+  id         Int       @id @default(autoincrement())
+  firstname  String?
+  lastname   String?
+  birthDate  DateTime?
+  phone      String?
+  gender     Gender?
+  avatar     String?
+  customerId Int       @unique
+  customer   User      @relation(fields: [customerId], references: [id])
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @default(now()) @updatedAt
+}
+
+enum Gender {
+  FEMALE
+  MALE
+  NON_BINARY
+  PREFER_NOT_TO_SAY
+}
+
+model Point {
+  id              Int      @id @default(autoincrement())
+  pointsEarned    Int
+  pointsRemaining Int
+  pointsExpiry    DateTime
+  pointsOwnerId   Int
+  pointsOwner     User     @relation(fields: [pointsOwnerId], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
 }

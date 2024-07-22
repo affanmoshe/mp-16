@@ -8,12 +8,19 @@ import express, {
   Router,
 } from 'express';
 import cors from 'cors';
-import { PORT } from './config';
+
+import { FRONTEND_URL, PORT } from './config';
 import { EventsRouter } from './routers/events.router';
 import { ReviewRouter } from './routers/reviews.router';
 import { TicketRouter } from './routers/tickets.router';
 import { TransactionRouter } from './routers/transactions.router';
 import { PromotionRouter } from './routers/promotions.router';
+import { AuthRouter } from './routers/auth.router';
+import { UsersRouter } from './routers/users.router';
+import { PasswordRouter } from './routers/password.router';
+import { OrganizersRouter } from './routers/organizers.router';
+// import { SampleRouter } from './routers/sample.router';
+
 
 export default class App {
   private app: Express;
@@ -26,7 +33,12 @@ export default class App {
   }
 
   private configure(): void {
-    this.app.use(cors());
+    this.app.use(
+      cors({
+        origin: FRONTEND_URL,
+        credentials: true,
+      }),
+    );
     this.app.use(json());
     this.app.use(urlencoded({ extended: true }));
   }
@@ -45,8 +57,8 @@ export default class App {
     this.app.use(
       (err: Error, req: Request, res: Response, next: NextFunction) => {
         if (req.path.includes('/api/')) {
-          console.error('Error: ', err.stack);
-          res.status(500).send('Error!');
+          console.error('Error : ', err.stack);
+          res.status(500).send(err.message);
         } else {
           next();
         }
@@ -60,6 +72,10 @@ export default class App {
     const ticketsRouter = new TicketRouter();
     const transactionsRouter = new TransactionRouter();
     const promotionsRouter = new PromotionRouter();
+    const authRouter = new AuthRouter();
+    const usersRouter = new UsersRouter();
+    const passwordRouter = new PasswordRouter();
+    const organizersRouter = new OrganizersRouter();
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
@@ -70,6 +86,10 @@ export default class App {
     this.app.use('/api/tickets', ticketsRouter.getRouter());
     this.app.use('/api/transactions', transactionsRouter.getRouter());
     this.app.use('/api/promotions', promotionsRouter.getRouter());
+    this.app.use('/api/auth', authRouter.getRouter());
+    this.app.use('/api/users', usersRouter.getRouter());
+    this.app.use('/api/password', passwordRouter.getRouter());
+    this.app.use('/api/organizers', organizersRouter.getRouter());
   }
 
   public start(): void {
