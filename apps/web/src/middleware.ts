@@ -43,7 +43,6 @@ export async function middleware(request: NextRequest) {
   }
 
   // check if access token is expired
-
   // Refresh ACCESS_TOKEN if REFRESH_TOKEN & ACCESS_TOKEN  is available but ACCESS_TOKEN is expired
   if (REFRESH_TOKEN) {
     const isTokenExpired = await expiryChecker(ACCESS_TOKEN);
@@ -85,8 +84,9 @@ export async function middleware(request: NextRequest) {
 
       role = data.data.role;
     } catch (error) {
-      if (error instanceof AxiosError)
-        console.log('error di access', error.response?.data);
+      if (error instanceof AxiosError) {
+        console.log('error di axios', error.response?.data);
+      }
 
       response.cookies.delete('access-token');
       response.cookies.delete('refresh-token');
@@ -103,7 +103,9 @@ export async function middleware(request: NextRequest) {
       url.startsWith('/lupa-password') ||
       url.startsWith('/reset-password')
     ) {
-      return NextResponse.redirect(new URL('/', request.url));
+      const redirect = request.nextUrl.searchParams.get('redirect') || '/';
+
+      return NextResponse.redirect(new URL(redirect, request.url));
     }
 
     if (url.startsWith('/dashboard') && role !== 'ORGANIZER') {
@@ -119,9 +121,10 @@ export async function middleware(request: NextRequest) {
       url.startsWith('/transaction') ||
       url.startsWith('/verifikasi')
     ) {
-      return NextResponse.redirect(
-        new URL(`/login?redirect=${encodeURIComponent(url)}`, request.url),
-      );
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', url);
+
+      return NextResponse.redirect(loginUrl);
     }
   }
 
