@@ -119,7 +119,11 @@ const RegisterForm = ({ role }: { role: number }) => {
             <FormItem className="grid gap-2">
               <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input placeholder="jacktheripper" {...field} />
+                <Input
+                  placeholder="jacktheripper"
+                  {...field}
+                  autoComplete="username"
+                />
               </FormControl>
               {/* <FormDescription>
                 This is your public display name.
@@ -135,7 +139,11 @@ const RegisterForm = ({ role }: { role: number }) => {
             <FormItem className="grid gap-2">
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="mail@example.com" {...field} />
+                <Input
+                  placeholder="mail@example.com"
+                  {...field}
+                  autoComplete="email"
+                />
               </FormControl>
               {/* <FormDescription>
                 This is your public display name.
@@ -151,7 +159,7 @@ const RegisterForm = ({ role }: { role: number }) => {
             <FormItem className="grid gap-2">
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} type="password" autoComplete="new-password" />
               </FormControl>
               {/* <FormDescription>
                 This is your public display name.
