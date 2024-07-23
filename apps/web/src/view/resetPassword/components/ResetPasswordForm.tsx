@@ -99,7 +99,7 @@ const ResetPasswordForm = (props: Props) => {
             <FormItem className="grid gap-2">
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} type="password" autoComplete="new-password" />
               </FormControl>
 
               <FormMessage />
@@ -113,7 +113,11 @@ const ResetPasswordForm = (props: Props) => {
             <FormItem className="grid gap-2">
               <FormLabel>Confirm password</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input
+                  {...field}
+                  type="password"
+                  autoComplete="new-password webauthn"
+                />
               </FormControl>
 
               <FormMessage />

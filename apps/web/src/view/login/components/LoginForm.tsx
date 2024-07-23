@@ -35,7 +35,7 @@ const LoginForm = (props: Props) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = decodeURIComponent(searchParams.get('redirect') || '%2F');
+  const redirect = searchParams.get('redirect') || '/';
 
   const [isSubmitLoading, setSubmitLoading] = useState<boolean>(false);
 
@@ -59,7 +59,7 @@ const LoginForm = (props: Props) => {
       if (res) {
         setTimeout(() => {
           form.reset();
-          router.push(redirect);
+          router.refresh();
         }, 1500);
       }
     } catch (error: any) {
@@ -89,7 +89,11 @@ const LoginForm = (props: Props) => {
             <FormItem className="grid gap-2">
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="mail@example.com" {...field} />
+                <Input
+                  placeholder="mail@example.com"
+                  {...field}
+                  autoComplete="email"
+                />
               </FormControl>
 
               <FormMessage />
@@ -111,7 +115,11 @@ const LoginForm = (props: Props) => {
                 </Link>
               </div>
               <FormControl>
-                <Input {...field} />
+                <Input
+                  {...field}
+                  type="password"
+                  autoComplete="current-password"
+                />
               </FormControl>
 
               <FormMessage />

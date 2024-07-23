@@ -1,9 +1,9 @@
 import { Dispatch } from '@reduxjs/toolkit';
+import { redirect } from 'next/navigation';
 import parseJWT from '@/utils/parseJwt';
 import instance from '@/utils/axiosInstance';
 import { deleteCookie, getCookie, setCookie } from 'cookies-next';
 import { loginState, logoutState } from '@/lib/features/auth/authSlice';
-import { useAppDispatch } from '@/lib/hooks';
 import { AxiosError } from 'axios';
 
 type User = {
@@ -48,11 +48,9 @@ export const register = ({
 
       return true;
     } catch (error) {
-      if (error instanceof Error) {
-        deleteCookie('access-token');
-        deleteCookie('refresh-token');
-        throw error;
-      }
+      deleteCookie('access-token');
+      deleteCookie('refresh-token');
+      throw error;
     }
   };
 };
@@ -80,11 +78,9 @@ export const login = ({
 
       return true;
     } catch (error) {
-      if (error instanceof Error) {
-        deleteCookie('access-token');
-        deleteCookie('refresh-token');
-        throw error;
-      }
+      deleteCookie('access-token');
+      deleteCookie('refresh-token');
+      throw error;
     }
   };
 };
@@ -98,9 +94,7 @@ export const logout = () => {
 
       return true;
     } catch (error) {
-      if (error instanceof Error) {
-        throw error;
-      }
+      throw error;
     }
   };
 };
