@@ -21,9 +21,79 @@ export class OrganizersRouter {
 
   private initializeRoutes(): void {
     // for accessing organizer data publicly (unauthenticated)
+    // this.router.get(
+    //   '/:username',
+    //   this.organizersController.organizerProfileController,
+    // );
+
     this.router.get(
-      '/:username',
-      this.organizersController.organizerProfileController,
+      '/events',
+      this.guard.verifyAccessToken,
+      this.guard.verifyRole('ORGANIZER'),
+      this.organizersController.getOrganizerAllEventsController,
+    );
+
+    this.router.get(
+      '/events/:eventId',
+      this.guard.verifyAccessToken,
+      this.guard.verifyRole('ORGANIZER'),
+      this.organizersController.getOrganizerEventByIdController,
+    );
+
+    this.router.get(
+      '/promotion-count/:eventId',
+      this.guard.verifyAccessToken,
+      this.guard.verifyRole('ORGANIZER'),
+      this.organizersController.getEventPromotionCountController,
+    );
+
+    this.router.get(
+      '/transactions/:eventId',
+      this.guard.verifyAccessToken,
+      this.guard.verifyRole('ORGANIZER'),
+      this.organizersController.getEventTransactionController,
+    );
+
+    this.router.get(
+      '/transactions-stats/:eventId',
+      this.guard.verifyAccessToken,
+      this.guard.verifyRole('ORGANIZER'),
+      this.organizersController.getTransactionStatsController,
+    );
+
+    this.router.get(
+      '/revenue-count/:eventId',
+      this.guard.verifyAccessToken,
+      this.guard.verifyRole('ORGANIZER'),
+      this.organizersController.getEventRevenueController,
+    );
+
+    this.router.get(
+      '/ticket-count/:eventId',
+      this.guard.verifyAccessToken,
+      this.guard.verifyRole('ORGANIZER'),
+      this.organizersController.getEventTicketCountController,
+    );
+
+    this.router.get(
+      '/tickets/:eventId',
+      this.guard.verifyAccessToken,
+      this.guard.verifyRole('ORGANIZER'),
+      this.organizersController.getEventTicketController,
+    );
+
+    this.router.get(
+      '/reviews/:eventId',
+      this.guard.verifyAccessToken,
+      this.guard.verifyRole('ORGANIZER'),
+      this.organizersController.getEventReviewsController,
+    );
+
+    this.router.get(
+      '/promotions/:eventId',
+      this.guard.verifyAccessToken,
+      this.guard.verifyRole('ORGANIZER'),
+      this.organizersController.getEventPromotionsController,
     );
 
     this.router.get(
