@@ -1,22 +1,45 @@
 import { Router } from 'express';
 import { PromotionController } from '../controllers/promotion.controller';
+import { AuthMiddleware } from '@/middlewares/auth.middleware';
 
 export class PromotionRouter {
   private router: Router;
   private promotionController: PromotionController;
+  private guard: AuthMiddleware;
 
   constructor() {
     this.promotionController = new PromotionController();
+    this.guard = new AuthMiddleware();
     this.router = Router();
     this.initializeRoutes();
   }
 
   private initializeRoutes(): void {
-    this.router.post('/create', this.promotionController.createPromotionController);
-    this.router.get('/promotions', this.promotionController.getAllPromotionsController);
-    this.router.get('/promotion?id', this.promotionController.getPromotionByIdController);
-    this.router.patch('/update-promotion?id', this.promotionController.updatePromotionByIdController);
-    this.router.delete('/delete-promotion?id', this.promotionController.deletePromotionByIdController);
+    this.router.post(
+      '/create',
+      this.guard.verifyAccessToken,
+      this.guard.verifyRole('ORGANIZER'),
+      this.promotionController.createPromotionController,
+    );
+
+    this.router.get('/', this.promotionController.getAllPromotionsController);
+    this.router.get(
+      '/:promotionId',
+      this.promotionController.getPromotionByIdController,
+    );
+
+    this.router.patch(
+      '/update/:promotionId',
+      this.guard.verifyAccessToken,
+      this.guard.verifyRole('ORGANIZER'),
+      this.promotionController.updatePromotionController,
+    );
+    this.router.delete(
+      '/delete/:promotionId',
+      this.guard.verifyAccessToken,
+      this.guard.verifyRole('ORGANIZER'),
+      this.promotionController.deletePromotionController,
+    );
   }
 
   getRouter(): Router {
