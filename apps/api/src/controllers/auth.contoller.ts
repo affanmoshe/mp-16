@@ -37,7 +37,7 @@ export class AuthController {
         email,
         password,
         referrerCode,
-        roleId,
+        Number(roleId),
       );
 
       res
