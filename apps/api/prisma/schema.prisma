@@ -21,92 +21,128 @@ datasource db {
 // }
 
 model Event {
-  id             Int      @id @default(autoincrement())
+  id             Int           @id @default(autoincrement())
   organizerId    Int
+  organizer      User          @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  thumbnail      String?
   name           String
   description    String?
   location       String
-  date           DateTime
-  time           DateTime
-  ticketType     String
-  price          Int      @default(0)
+  dateTime       DateTime      @default(now())
+  ticketType     TicketType
+  price          Int           @default(0)
   availableSeats Int
-  promotion      Int?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  status         EventStatus   @default(DRAFT)
+  promotion      Promotion[]
+  review         Review[]
+  transaction    Transaction[]
+  ticket         Ticket[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
 }
 
 model Review {
   id         Int      @id @default(autoincrement())
-  customerId Int
+  customerId Int?
+  customer   User?    @relation(fields: [customerId], references: [id], onDelete: SetNull)
   eventId    Int
+  event      Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   rating     Int
   reviewText String
   createdAt  DateTime @default(now())
 }
 
 model Ticket {
-  id            Int      @id @default(autoincrement())
-  eventId       Int
-  customerId    Int
-  transactionId Int
+  id            Int          @id @default(autoincrement())
+  eventId       Int?
+  event         Event?       @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  customerId    Int?
+  customer      User?        @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  transactionId Int?
+  transaction   Transaction? @relation(fields: [transactionId], references: [id], onDelete: SetNull)
   price         Int
-  status        Int
-  createdAt     DateTime @default(now())
+  status        TicketStatus
+  createdAt     DateTime     @default(now())
 }
 
 model Transaction {
-  id            Int      @id @default(autoincrement())
-  customerId    Int
-  eventId       Int
-  totalAmount   Int
-  promotionsId  Int
-  paymentStatus String
-  createdAt     DateTime @default(now())
+  id            Int           @id @default(autoincrement())
+  customerId    Int?
+  customer      User?         @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  eventId       Int?
+  event         Event?        @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  amount        Int
+  discount      Int
+  finalAmount   Int
+  paymentStatus PaymentStatus
+  promotionId   Int?
+  promotion     Promotion?    @relation(fields: [promotionId], references: [id], onDelete: SetNull)
+  ticket        Ticket[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @default(now()) @updatedAt
 }
 
 model Promotion {
-  id             Int      @id @default(autoincrement())
+  id             Int           @id @default(autoincrement())
   eventId        Int
-  code           String   @unique
+  event          Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  code           String        @unique
   discountAmount Int
   usageLimit     Int
   validFrom      DateTime
   validTo        DateTime
-  createdAt      DateTime @default(now())
+  transaction    Transaction[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @default(now()) @updatedAt
 }
 
-enum ticketType {
-  paid
-  free
+enum TicketType {
+  PAID
+  FREE
 }
 
-enum paymentStatus {
-  paid
-  pending
-  failed
-  cancelled
+enum PaymentStatus {
+  PAID
+  PENDING
+  FAILED
+  CANCELLED
+}
+
+enum TicketStatus {
+  BOOKED
+  CHECKED_IN
+  CANCELLED
 }
 
 model User {
-  id               Int       @id @default(autoincrement())
-  email            String    @unique
-  username         String    @unique
+  id               Int           @id @default(autoincrement())
+  email            String        @unique
+  username         String        @unique
   password         String
-  referralCode     String    @unique
+  referralCode     String        @unique
   profile          Profile?
   roleId           Int
-  role             Role      @relation(fields: [roleId], references: [id])
+  role             Role          @relation(fields: [roleId], references: [id], onDelete: Cascade)
   referrerId       Int?
-  referrer         User?     @relation(name: "referred_by", fields: [referrerId], references: [id])
-  referee          User[]    @relation(name: "referred_by")
+  referrer         User?         @relation(name: "referred_by", fields: [referrerId], references: [id], onDelete: SetNull)
+  referee          User[]        @relation(name: "referred_by")
   points           Point[]
   discount         Discount?
-  isVerified       Boolean   @default(false)
+  isVerified       Boolean       @default(false)
   resetToken       String?
   resetTokenExpiry DateTime?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @default(now()) @updatedAt
+  event            Event[]
+  review           Review[]
+  ticket           Ticket[]
+  transaction      Transaction[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @default(now()) @updatedAt
 }
 
 model Role {
@@ -124,7 +160,7 @@ model Profile {
   gender     Gender?
   avatar     String?
   customerId Int       @unique
-  customer   User      @relation(fields: [customerId], references: [id])
+  customer   User      @relation(fields: [customerId], references: [id], onDelete: Cascade)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @default(now()) @updatedAt
 }
@@ -142,7 +178,7 @@ model Point {
   pointsRemaining Int
   pointsExpiry    DateTime
   pointsOwnerId   Int
-  pointsOwner     User     @relation(fields: [pointsOwnerId], references: [id])
+  pointsOwner     User     @relation(fields: [pointsOwnerId], references: [id], onDelete: Cascade)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now()) @updatedAt
 }
@@ -152,5 +188,5 @@ model Discount {
   discountRate   Float
   discountExpiry DateTime
   customerId     Int      @unique
-  customer       User     @relation(fields: [customerId], references: [id])
+  customer       User     @relation(fields: [customerId], references: [id], onDelete: Cascade)
 }
