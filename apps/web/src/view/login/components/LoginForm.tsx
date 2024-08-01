@@ -92,7 +92,7 @@ const LoginForm = (props: Props) => {
                 <Input
                   placeholder="mail@example.com"
                   {...field}
-                  autoComplete="email"
+                  // autoComplete="email"
                 />
               </FormControl>
 
