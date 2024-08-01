@@ -3,7 +3,7 @@ import prisma from '../prisma';
 export class PointsAction {
   public applyDiscountAction = async (id: number, price: number) => {
     try {
-      const discount = await prisma.discount.findFirst({
+      const discountRate = await prisma.discount.findFirst({
         where: {
           customerId: id,
           discountExpiry: {
@@ -13,18 +13,18 @@ export class PointsAction {
       });
 
       // if no discount available, return the original price
-      if (!discount) return price;
+      if (!discountRate) return price;
 
       // calculate the final price based on discount rate
-      let finalPrice = price * (1 - discount.discountRate);
+      let discount = price * discountRate.discountRate;
 
       await prisma.discount.delete({
         where: {
-          id: discount.id,
+          id: discountRate.id,
         },
       });
 
-      return finalPrice;
+      return discount;
     } catch (error) {
       throw error;
     }
