@@ -12,11 +12,30 @@ export class TransactionRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.post('/create-transactions', this.transactionController.createTransactionController);
-    this.router.get('/transactions', this.transactionController.getAllTransactionsController);
-    this.router.get('/customer?id', this.transactionController.getTransactionsByCustomerIdController);
-    this.router.patch('/transaction?id', this.transactionController.updateTransactionByIdController);
-    this.router.delete('/transaction?id', this.transactionController.deleteTransactionByIdController);
+    this.router.post(
+      '/create-transactions',
+      this.transactionController.createTransactionController,
+    );
+    // this.router.post(
+    //   '/create-many',
+    //   this.transactionController.createManyTransaction,
+    // );
+    this.router.get(
+      '/transactions',
+      this.transactionController.getAllTransactionsController,
+    );
+    this.router.get(
+      '/customer?id',
+      this.transactionController.getTransactionsByCustomerIdController,
+    );
+    this.router.patch(
+      '/transaction?id',
+      this.transactionController.updateTransactionByIdController,
+    );
+    this.router.delete(
+      '/transaction?id',
+      this.transactionController.deleteTransactionByIdController,
+    );
   }
 
   getRouter(): Router {
