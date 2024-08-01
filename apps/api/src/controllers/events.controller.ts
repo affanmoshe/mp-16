@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import eventAction from '../actions/events.action';
+import { User } from '@/types/express';
 
 export class EventsController {
   private errorHandler(
     err: Error,
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     console.error(err);
     res.status(500).json({ error: 'Internal server error' });
@@ -15,33 +16,33 @@ export class EventsController {
   public createEventController = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
+      const { id } = req.user as User;
       const {
-        organizerId,
         name,
         description,
         location,
-        date,
-        time,
+        dateTime,
         ticketType,
         price,
         availableSeats,
-        promotion,
+        status,
       } = req.body;
+      const { file } = req;
 
       const event = await eventAction.createEvent(
-        organizerId,
+        id,
+        file?.filename,
         name,
         description,
         location,
-        new Date(date),
-        new Date(time),
+        dateTime,
         ticketType,
-        price,
-        availableSeats,
-        promotion
+        Number(price),
+        Number(availableSeats),
+        status,
       );
 
       res.status(201).json({
@@ -56,7 +57,7 @@ export class EventsController {
   public getAllEventsController = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       const events = await eventAction.getAllEvents();
@@ -69,7 +70,7 @@ export class EventsController {
   public getEventByIdController = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       const eventId = parseInt(req.params.id);
@@ -83,33 +84,37 @@ export class EventsController {
   public updateEventByIdController = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
-      const eventId = parseInt(req.params.id);
+      const { id } = req.user as User;
+      const { eventId } = req.params;
+      const parsedEventId = parseInt(eventId);
+
       const {
         name,
         description,
         location,
-        date,
-        time,
+        dateTime,
         ticketType,
         price,
         availableSeats,
-        promotion,
+        status,
       } = req.body;
+      const { file } = req;
 
       const updatedEvent = await eventAction.updateEventById(
-        eventId,
+        id,
+        parsedEventId,
+        file?.filename,
         name,
         description,
         location,
-        new Date(date),
-        new Date(time),
+        dateTime,
         ticketType,
-        price,
-        availableSeats,
-        promotion
+        Number(price),
+        Number(availableSeats),
+        status,
       );
 
       res.status(200).json({
@@ -124,14 +129,17 @@ export class EventsController {
   public deleteEventByIdController = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
-      const eventId = parseInt(req.params.id);
-      const deletedEvent = await eventAction.deleteEventById(eventId);
+      const { id } = req.user as User;
+      const { eventId } = req.params;
+      const parsedEventId = parseInt(eventId);
+
+      await eventAction.deleteEventById(id, parsedEventId);
+
       res.status(200).json({
         message: 'Event deleted successfully',
-        data: deletedEvent,
       });
     } catch (error) {
       next(error);
