@@ -52,9 +52,9 @@ export class PointsAction {
         }
       });
 
-      const finalPrice = price - totalRedeemed;
+      // const finalPrice = price - totalRedeemed;
 
-      return finalPrice;
+      return totalRedeemed;
     } catch (error) {
       throw error;
     }

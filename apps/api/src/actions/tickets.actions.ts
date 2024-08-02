@@ -7,7 +7,7 @@ class TicketAction {
     customerId: number,
     transactionId: number,
     price: number,
-    status: TicketStatus
+    status: TicketStatus,
   ) {
     try {
       const ticket = await prisma.ticket.create({
@@ -50,7 +50,7 @@ class TicketAction {
   public async updateTicketById(
     id: number,
     price: number,
-    status: TicketStatus
+    status: TicketStatus,
   ) {
     try {
       const ticket = await prisma.ticket.update({

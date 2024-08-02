@@ -1,13 +1,24 @@
+import transactionAction from '@/actions/transaction.action';
+import prisma from '@/prisma';
 import { NextFunction, Request, Response } from 'express';
-import TransactionAction from '../actions/transaction.action';
+transactionAction;
 
 export class TransactionController {
-  private errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
+  private errorHandler(
+    err: Error,
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
     console.error(err);
     res.status(500).json({ error: 'Internal server error' });
   }
 
-  public createTransactionController = async (req: Request, res: Response, next: NextFunction) => {
+  public createTransactionController = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const { customerId, eventId, ticketQuantity, selectedDiscounts, paymentStatus } = req.body;
       const transaction = await TransactionAction.createTransaction(
@@ -26,7 +37,11 @@ export class TransactionController {
     }
   };
 
-  public getAllTransactionsController = async (req: Request, res: Response, next: NextFunction) => {
+  public getAllTransactionsController = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const transactions = await TransactionAction.getAllTransactions();
       res.status(200).json(transactions);
@@ -34,6 +49,7 @@ export class TransactionController {
       next(error);
     }
   };
+
 
   public getTransactionsByCustomerIdController = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -45,11 +61,22 @@ export class TransactionController {
     }
   };
 
-  public updateTransactionByIdController = async (req: Request, res: Response, next: NextFunction) => {
+
+  public updateTransactionByIdController = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const transactionId = parseInt(req.params.id);
-      const { finalAmount, paymentStatus } = req.body;
-      const updatedTransaction = await TransactionAction.updateTransactionById(transactionId, finalAmount, paymentStatus);
+      const { totalAmount, paymentStatus } = req.body;
+
+      const updatedTransaction = await transactionAction.updateTransactionById(
+        transactionId,
+        totalAmount,
+        paymentStatus,
+      );
+
       res.status(200).json({
         message: 'Transaction updated successfully',
         data: updatedTransaction,
@@ -59,10 +86,15 @@ export class TransactionController {
     }
   };
 
-  public deleteTransactionByIdController = async (req: Request, res: Response, next: NextFunction) => {
+  public deleteTransactionByIdController = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const transactionId = parseInt(req.params.id);
-      const deletedTransaction = await TransactionAction.deleteTransactionById(transactionId);
+      const deletedTransaction =
+        await transactionAction.deleteTransactionById(transactionId);
       res.status(200).json({
         message: 'Transaction deleted successfully',
         data: deletedTransaction,
@@ -70,7 +102,39 @@ export class TransactionController {
     } catch (error) {
       next(error);
     }
-  }
+  };
+
+  // public createManyTransaction = async (
+  //   req: Request,
+  //   res: Response,
+  //   next: NextFunction,
+  // ) => {
+  //   try {
+  //     const list = req.body;
+
+  //     const final = list.map((item: any, index: number) => {
+  //       return {
+  //         customerId: Number(item.customerId),
+  //         eventId: Number(item.eventId),
+  //         paymentStatus: item.paymentStatus,
+  //         createdAt: new Date(item.createdAt),
+  //         amount: Number(item.amount),
+  //         discount: Number(item.discount),
+  //         finalAmount: Number(item.finalAmount),
+  //       };
+  //     });
+  //     const create = await prisma.transaction.createMany({
+  //       data: final,
+  //     });
+
+  //     res.status(200).json({
+  //       message: 'Transaction updated successfully',
+  //       data: create,
+  //     });
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // };
 }
 
 export default new TransactionController();

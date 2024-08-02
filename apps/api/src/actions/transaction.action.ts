@@ -1,3 +1,4 @@
+import { PaymentStatus } from '@prisma/client';
 import prisma from '../prisma';
 import PointsAction from './points.action';
 import promotionAction from './promotion.action';
@@ -97,8 +98,8 @@ class TransactionAction {
 
   public async updateTransactionById(
     id: number,
-    finalAmount: number,
-    paymentStatus: PaymentStatus
+    amount: number,
+    paymentStatus: PaymentStatus,
   ) {
     try {
       const transaction = await prisma.transaction.update({
@@ -106,7 +107,7 @@ class TransactionAction {
           id,
         },
         data: {
-          finalAmount,
+          amount,
           paymentStatus,
         },
       });

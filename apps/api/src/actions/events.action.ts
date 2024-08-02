@@ -1,22 +1,25 @@
 import { EventStatus, TicketType } from '@prisma/client';
 import prisma from '../prisma';
+import usersAction from './users.action';
 
 class EventAction {
   public async createEvent(
     organizerId: number,
+    thumbnail: string = '',
     name: string,
-    description: string | null,
+    description: string = '',
     location: string,
     dateTime: Date,
     ticketType: TicketType,
     price: number,
     availableSeats: number,
-    status: EventStatus
+    status: EventStatus,
   ) {
     try {
       const event = await prisma.event.create({
         data: {
           organizerId,
+          thumbnail,
           name,
           description,
           location,
@@ -25,7 +28,7 @@ class EventAction {
           price,
           availableSeats,
           status,
-        }
+        },
       });
       return event;
     } catch (error) {
@@ -89,44 +92,59 @@ class EventAction {
   }
 
   public async updateEventById(
-    id: number,
+    organizerId: number,
+    eventId: number,
+    thumbnail: string = '',
     name: string,
-    description: string | null,
+    description: string = '',
     location: string,
     dateTime: Date,
     ticketType: TicketType,
     price: number,
     availableSeats: number,
+    status: EventStatus,
   ) {
     try {
+      // check if the user id is valid
+      const check = await usersAction.findSelfById(organizerId);
+      if (!check) throw new Error('User not found');
+
+      let content = {};
+
+      if (thumbnail !== undefined) content = { ...content, thumbnail };
+      if (name) content = { ...content, name };
+      if (description !== undefined) content = { ...content, description };
+      if (location) content = { ...content, location };
+      if (dateTime) content = { ...content, dateTime };
+      if (ticketType) content = { ...content, ticketType };
+      if (price) content = { ...content, price };
+      if (availableSeats) content = { ...content, availableSeats };
+      if (status) content = { ...content, status };
+
       const event = await prisma.event.update({
         where: {
-          id,
+          id: eventId,
+          organizerId,
         },
         data: {
-          name,
-          description,
-          location,
-          dateTime,
-          ticketType,
-          price,
-          availableSeats,
+          ...content,
         },
       });
+
       return event;
     } catch (error) {
       throw error;
     }
   }
-  
-  public async deleteEventById(id: number) {
+
+  public async deleteEventById(organizerId: number, eventId: number) {
     try {
-      const event = await prisma.event.delete({
+      await prisma.event.delete({
         where: {
-          id,
+          id: eventId,
+          organizerId,
         },
       });
-      return event;
     } catch (error) {
       throw error;
     }
