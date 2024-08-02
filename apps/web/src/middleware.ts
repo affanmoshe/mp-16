@@ -113,7 +113,10 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/', request.url));
     }
 
-    if (url.startsWith('/transaction') && role !== 'CUSTOMER') {
+    if (
+      url.startsWith('/discovery') ||
+      (url.startsWith('/events') && role !== 'CUSTOMER')
+    ) {
       return NextResponse.redirect(new URL('/', request.url));
     }
   } else {

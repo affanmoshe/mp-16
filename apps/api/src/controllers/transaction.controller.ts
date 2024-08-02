@@ -20,13 +20,19 @@ export class TransactionController {
     next: NextFunction,
   ) => {
     try {
-      const { customerId, eventId, ticketQuantity, selectedDiscounts, paymentStatus } = req.body;
-      const transaction = await TransactionAction.createTransaction(
+      const {
         customerId,
         eventId,
         ticketQuantity,
         selectedDiscounts,
-        paymentStatus
+        paymentStatus,
+      } = req.body;
+      const transaction = await transactionAction.createTransaction(
+        customerId,
+        eventId,
+        ticketQuantity,
+        selectedDiscounts,
+        paymentStatus,
       );
       res.status(201).json({
         message: 'Transaction created successfully',
@@ -43,24 +49,27 @@ export class TransactionController {
     next: NextFunction,
   ) => {
     try {
-      const transactions = await TransactionAction.getAllTransactions();
+      const transactions = await transactionAction.getAllTransactions();
       res.status(200).json(transactions);
     } catch (error) {
       next(error);
     }
   };
 
-
-  public getTransactionsByCustomerIdController = async (req: Request, res: Response, next: NextFunction) => {
+  public getTransactionsByCustomerIdController = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const customerId = parseInt(req.params.customerId);
-      const transactions = await TransactionAction.getTransactionsByCustomerId(customerId);
+      const transactions =
+        await transactionAction.getTransactionsByCustomerId(customerId);
       res.status(200).json(transactions);
     } catch (error) {
       next(error);
     }
   };
-
 
   public updateTransactionByIdController = async (
     req: Request,

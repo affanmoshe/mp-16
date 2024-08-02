@@ -53,8 +53,8 @@ const TransactionView: React.FC<TransactionViewProps> = ({ eventId }) => {
             Event Not Found
           </h1>
           <p className="text-gray-600">
-            We couldn't find the event you're looking for. Please check the ID
-            and try again.
+            We couldn&apos;t find the event you&apos;re looking for. Please
+            check the ID and try again.
           </p>
         </div>
       </div>

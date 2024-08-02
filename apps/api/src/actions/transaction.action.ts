@@ -1,4 +1,3 @@
-import { PaymentStatus } from '@prisma/client';
 import prisma from '../prisma';
 import PointsAction from './points.action';
 import promotionAction from './promotion.action';
@@ -11,7 +10,7 @@ class TransactionAction {
     eventId: number,
     ticketQuantity: number, // Number of tickets
     selectedDiscounts: { type: 'points' | 'promotion'; id: number }[],
-    paymentStatus: PaymentStatus
+    paymentStatus: PaymentStatus,
   ) {
     // Check if the event exists
     const event = await prisma.event.findUnique({
@@ -30,11 +29,17 @@ class TransactionAction {
     // Process points and promotion discounts
     for (const discount of selectedDiscounts) {
       if (discount.type === 'points') {
-        const pointsDiscount = await PointsAction.redeemAction(discount.id, finalAmount);
+        const pointsDiscount = await PointsAction.redeemAction(
+          discount.id,
+          finalAmount,
+        );
         discountAmount += finalAmount - pointsDiscount;
         finalAmount = pointsDiscount;
       } else if (discount.type === 'promotion') {
-        const promotionDiscount = await discountsAction.applyDiscountAction(discount.id, finalAmount);
+        const promotionDiscount = await discountsAction.applyDiscountAction(
+          discount.id,
+          finalAmount,
+        );
         discountAmount += finalAmount - promotionDiscount;
         finalAmount = promotionDiscount;
       }
@@ -60,12 +65,12 @@ class TransactionAction {
         });
 
         if (promotion && promotion.usageLimit > 0) {
-          await promotionAction.updatePromotionById(
+          await promotionAction.updatePromotionAction(
             promotion.id,
             promotion.discountAmount,
             promotion.usageLimit - 1, // Decrement the usage limit by 1 per usage
             promotion.validFrom,
-            promotion.validTo
+            promotion.validTo,
           );
         }
       }

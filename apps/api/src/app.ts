@@ -23,7 +23,6 @@ import { PasswordRouter } from './routers/password.router';
 import { OrganizersRouter } from './routers/organizers.router';
 import { PointsRouter } from './routers/points.router';
 import { DiscountsRouter } from './routers/discounts.router';
-// import { SampleRouter } from './routers/sample.router';
 
 export default class App {
   private app: Express;
