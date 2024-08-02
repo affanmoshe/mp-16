@@ -36,10 +36,42 @@ class EventAction {
     }
   }
 
-  public async getAllEvents() {
+  public async getAllEvents(page: number, pageSize: number, searchQuery?: string, filterBy?: { location?: string; category?: string }) {
     try {
-      const events = await prisma.event.findMany();
-      return events;
+      const filters: any = {};
+
+      // Search by name
+      if (searchQuery) {
+        filters.name = {
+          contains: searchQuery,
+        };
+      }
+
+      // Filter by location
+      if (filterBy?.location) {
+        filters.location = {
+          contains: filterBy.location,
+        };
+      }
+
+      // Filter by category
+      if (filterBy?.category) {
+        filters.category = {
+          equals: filterBy.category,
+        };
+      }
+
+      // Fetch events with pagination
+      const events = await prisma.event.findMany({
+        where: filters,
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      });
+
+      // Count total events for pagination
+      const totalCount = await prisma.event.count({ where: filters });
+
+      return { events, totalCount };
     } catch (error) {
       throw error;
     }

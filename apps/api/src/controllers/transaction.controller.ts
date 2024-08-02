@@ -20,26 +20,14 @@ export class TransactionController {
     next: NextFunction,
   ) => {
     try {
-      const {
+      const { customerId, eventId, ticketQuantity, selectedDiscounts, paymentStatus } = req.body;
+      const transaction = await TransactionAction.createTransaction(
         customerId,
         eventId,
-        amount,
-        discount,
-        finalAmount,
-        promotionsId,
-        paymentStatus,
-      } = req.body;
-
-      const transaction = await transactionAction.createTransaction(
-        customerId,
-        eventId,
-        amount,
-        discount,
-        finalAmount,
-        promotionsId,
-        paymentStatus,
+        ticketQuantity,
+        selectedDiscounts,
+        paymentStatus
       );
-
       res.status(201).json({
         message: 'Transaction created successfully',
         data: transaction,
@@ -55,27 +43,24 @@ export class TransactionController {
     next: NextFunction,
   ) => {
     try {
-      const transactions = await transactionAction.getAllTransactions();
+      const transactions = await TransactionAction.getAllTransactions();
       res.status(200).json(transactions);
     } catch (error) {
       next(error);
     }
   };
 
-  public getTransactionsByCustomerIdController = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => {
+
+  public getTransactionsByCustomerIdController = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const customerId = parseInt(req.params.customerId);
-      const transactions =
-        await transactionAction.getTransactionsByCustomerId(customerId);
+      const transactions = await TransactionAction.getTransactionsByCustomerId(customerId);
       res.status(200).json(transactions);
     } catch (error) {
       next(error);
     }
   };
+
 
   public updateTransactionByIdController = async (
     req: Request,

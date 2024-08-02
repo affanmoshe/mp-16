@@ -1,6 +1,6 @@
 import prisma from '../prisma';
 
-export class PointsAction {
+export class DiscountsAction {
   public applyDiscountAction = async (id: number, price: number) => {
     try {
       const discountRate = await prisma.discount.findFirst({
@@ -48,4 +48,4 @@ export class PointsAction {
   };
 }
 
-export default new PointsAction();
+export default new DiscountsAction();

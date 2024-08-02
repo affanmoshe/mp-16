@@ -60,8 +60,16 @@ export class EventsController {
     next: NextFunction,
   ) => {
     try {
-      const events = await eventAction.getAllEvents();
-      res.status(200).json(events);
+      const page = parseInt(req.query.page as string) || 1;
+      const pageSize = parseInt(req.query.pageSize as string) || 10;
+      const searchQuery = req.query.search as string;
+      const filterBy = {
+        location: req.query.location as string,
+        category: req.query.category as string,
+      };
+
+      const { events, totalCount } = await eventAction.getAllEvents(page, pageSize, searchQuery, filterBy);
+      res.status(200).json({ events, totalCount });
     } catch (error) {
       next(error);
     }
@@ -119,7 +127,7 @@ export class EventsController {
 
       res.status(200).json({
         message: 'Event updated successfully',
-        data: updatedEvent,
+        data: updatedEvent, 
       });
     } catch (error) {
       next(error);
@@ -144,7 +152,7 @@ export class EventsController {
     } catch (error) {
       next(error);
     }
-  };
+  }
 }
 
 export default new EventsController();
