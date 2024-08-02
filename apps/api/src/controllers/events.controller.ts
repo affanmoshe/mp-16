@@ -23,12 +23,11 @@ export class EventsController {
         name,
         description,
         location,
-        date,
-        time,
+        dateTime,
         ticketType,
         price,
         availableSeats,
-        promotion,
+        status,
       } = req.body;
 
       const event = await eventAction.createEvent(
@@ -36,12 +35,11 @@ export class EventsController {
         name,
         description,
         location,
-        new Date(date),
-        new Date(time),
+        new Date(dateTime),
         ticketType,
         price,
         availableSeats,
-        promotion
+        status,
       );
 
       res.status(201).json({
@@ -59,8 +57,16 @@ export class EventsController {
     next: NextFunction
   ) => {
     try {
-      const events = await eventAction.getAllEvents();
-      res.status(200).json(events);
+      const page = parseInt(req.query.page as string) || 1;
+      const pageSize = parseInt(req.query.pageSize as string) || 10;
+      const searchQuery = req.query.search as string;
+      const filterBy = {
+        location: req.query.location as string,
+        category: req.query.category as string,
+      };
+
+      const { events, totalCount } = await eventAction.getAllEvents(page, pageSize, searchQuery, filterBy);
+      res.status(200).json({ events, totalCount });
     } catch (error) {
       next(error);
     }
@@ -91,30 +97,27 @@ export class EventsController {
         name,
         description,
         location,
-        date,
-        time,
+        dateTime,
         ticketType,
         price,
         availableSeats,
         promotion,
       } = req.body;
-
+      
       const updatedEvent = await eventAction.updateEventById(
         eventId,
         name,
         description,
         location,
-        new Date(date),
-        new Date(time),
+        new Date(dateTime),
         ticketType,
         price,
         availableSeats,
-        promotion
       );
 
       res.status(200).json({
         message: 'Event updated successfully',
-        data: updatedEvent,
+        data: updatedEvent, 
       });
     } catch (error) {
       next(error);
@@ -136,7 +139,7 @@ export class EventsController {
     } catch (error) {
       next(error);
     }
-  };
+  }
 }
 
 export default new EventsController();

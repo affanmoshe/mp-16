@@ -1,3 +1,4 @@
+import { EventStatus, TicketType } from '@prisma/client';
 import prisma from '../prisma';
 
 class EventAction {
@@ -6,12 +7,11 @@ class EventAction {
     name: string,
     description: string | null,
     location: string,
-    date: Date,
-    time: Date,
-    ticketType: string,
+    dateTime: Date,
+    ticketType: TicketType,
     price: number,
     availableSeats: number,
-    promotion: number | null
+    status: EventStatus
   ) {
     try {
       const event = await prisma.event.create({
@@ -20,13 +20,12 @@ class EventAction {
           name,
           description,
           location,
-          date,
-          time,
+          dateTime,
           ticketType,
           price,
           availableSeats,
-          promotion,
-        },
+          status,
+        }
       });
       return event;
     } catch (error) {
@@ -34,10 +33,42 @@ class EventAction {
     }
   }
 
-  public async getAllEvents() {
+  public async getAllEvents(page: number, pageSize: number, searchQuery?: string, filterBy?: { location?: string; category?: string }) {
     try {
-      const events = await prisma.event.findMany();
-      return events;
+      const filters: any = {};
+
+      // Search by name
+      if (searchQuery) {
+        filters.name = {
+          contains: searchQuery,
+        };
+      }
+
+      // Filter by location
+      if (filterBy?.location) {
+        filters.location = {
+          contains: filterBy.location,
+        };
+      }
+
+      // Filter by category
+      if (filterBy?.category) {
+        filters.category = {
+          equals: filterBy.category,
+        };
+      }
+
+      // Fetch events with pagination
+      const events = await prisma.event.findMany({
+        where: filters,
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      });
+
+      // Count total events for pagination
+      const totalCount = await prisma.event.count({ where: filters });
+
+      return { events, totalCount };
     } catch (error) {
       throw error;
     }
@@ -62,12 +93,10 @@ class EventAction {
     name: string,
     description: string | null,
     location: string,
-    date: Date,
-    time: Date,
-    ticketType: string,
+    dateTime: Date,
+    ticketType: TicketType,
     price: number,
     availableSeats: number,
-    promotion: number | null
   ) {
     try {
       const event = await prisma.event.update({
@@ -78,12 +107,10 @@ class EventAction {
           name,
           description,
           location,
-          date,
-          time,
+          dateTime,
           ticketType,
           price,
           availableSeats,
-          promotion,
         },
       });
       return event;

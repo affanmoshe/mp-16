@@ -74,34 +74,34 @@ class AuthAction {
           },
         });
 
-        if (referrerId) {
-          const POINTS_EARNED = 10000;
-          const MONTHS_UNTIL_EXPIRES = 3;
+        // if (referrerId) {
+        //   const POINTS_EARNED = 10000;
+        //   const MONTHS_UNTIL_EXPIRES = 3;
 
-          const TODAY = new Date();
-          const EXPIRY_DATE = TODAY.setMonth(
-            TODAY.getMonth() + MONTHS_UNTIL_EXPIRES,
-          );
+        //   const TODAY = new Date();
+        //   const EXPIRY_DATE = TODAY.setMonth(
+        //     TODAY.getMonth() + MONTHS_UNTIL_EXPIRES,
+        //   );
 
-          await tx.point.create({
-            data: {
-              pointsEarned: POINTS_EARNED,
-              pointsRemaining: POINTS_EARNED,
-              pointsExpiry: new Date(EXPIRY_DATE),
-              pointsOwnerId: referrerId,
-            },
-          });
+        //   await tx.point.create({
+        //     data: {
+        //       pointsEarned: POINTS_EARNED,
+        //       pointsRemaining: POINTS_EARNED,
+        //       pointsExpiry: new Date(EXPIRY_DATE),
+        //       pointsOwnerId: referrerId,
+        //     },
+        //   });
 
-          await tx.discount.create({
-            data: {
-              discountRate: 0.1,
-              discountExpiry: new Date(EXPIRY_DATE),
-              customerId: user.id,
-            },
-          });
-        }
+        //   await tx.discount.create({
+        //     data: {
+        //       discountRate: 0.1,
+        //       discountExpiry: new Date(EXPIRY_DATE),
+        //       customerId: user.id,
+        //     },
+        //   });
+        // }
 
-        await this.sendVerifyEmail(email);
+        // await this.sendVerifyEmail(email);
       });
 
       const login = await this.login(email, password);

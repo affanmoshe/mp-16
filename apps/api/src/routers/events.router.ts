@@ -13,10 +13,10 @@ export class EventsRouter {
 
   private initializeRoutes(): void {
     this.router.post('/create-event', this.eventsController.createEventController);
-    this.router.get('/events', this.eventsController.getAllEventsController);
-    this.router.get('/event?id', this.eventsController.getEventByIdController);
-    this.router.patch('/update-event?id', this.eventsController.updateEventByIdController);
-    this.router.delete('/delete-event?id', this.eventsController.deleteEventByIdController);
+    this.router.get('/', this.eventsController.getAllEventsController);
+    this.router.get('/:id', this.eventsController.getEventByIdController);
+    this.router.patch('/update-event/:id', this.eventsController.updateEventByIdController);
+    this.router.delete('/delete-event/:id', this.eventsController.deleteEventByIdController);
   }
 
   getRouter(): Router {

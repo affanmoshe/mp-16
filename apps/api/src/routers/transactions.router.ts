@@ -1,6 +1,5 @@
 import { Router } from 'express';
-import { TransactionController } from '../controllers/transaction.controller';
-
+import transactionController, { TransactionController } from '@/controllers/transaction.controller'
 export class TransactionRouter {
   private router: Router;
   private transactionController: TransactionController;
@@ -14,9 +13,9 @@ export class TransactionRouter {
   private initializeRoutes(): void {
     this.router.post('/create-transactions', this.transactionController.createTransactionController);
     this.router.get('/transactions', this.transactionController.getAllTransactionsController);
-    this.router.get('/customer?id', this.transactionController.getTransactionsByCustomerIdController);
-    this.router.patch('/transaction?id', this.transactionController.updateTransactionByIdController);
-    this.router.delete('/transaction?id', this.transactionController.deleteTransactionByIdController);
+    this.router.get('/transactions/customer/:customerId', this.transactionController.getTransactionsByCustomerIdController);
+    this.router.patch('/transactions/:id', this.transactionController.updateTransactionByIdController);
+    this.router.delete('/transactions/:id', this.transactionController.deleteTransactionByIdController);
   }
 
   getRouter(): Router {

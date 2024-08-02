@@ -1,40 +1,22 @@
-import transactionAction from '@/actions/transaction.action';
 import { NextFunction, Request, Response } from 'express';
-transactionAction
+import TransactionAction from '../actions/transaction.action';
 
 export class TransactionController {
-  private errorHandler(
-    err: Error,
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
+  private errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
     console.error(err);
     res.status(500).json({ error: 'Internal server error' });
   }
 
-  public createTransactionController = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
+  public createTransactionController = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const {
+      const { customerId, eventId, ticketQuantity, selectedDiscounts, paymentStatus } = req.body;
+      const transaction = await TransactionAction.createTransaction(
         customerId,
         eventId,
-        totalAmount,
-        promotionsId,
-        paymentStatus,
-      } = req.body;
-
-      const transaction = await transactionAction.createTransaction(
-        customerId,
-        eventId,
-        totalAmount,
-        promotionsId,
+        ticketQuantity,
+        selectedDiscounts,
         paymentStatus
       );
-
       res.status(201).json({
         message: 'Transaction created successfully',
         data: transaction,
@@ -44,50 +26,30 @@ export class TransactionController {
     }
   };
 
-  public getAllTransactionsController = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
+  public getAllTransactionsController = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const transactions = await transactionAction.getAllTransactions();
+      const transactions = await TransactionAction.getAllTransactions();
       res.status(200).json(transactions);
     } catch (error) {
       next(error);
     }
   };
 
-  public getTransactionsByCustomerIdController = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
+  public getTransactionsByCustomerIdController = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const customerId = parseInt(req.params.customerId);
-      const transactions = await transactionAction.getTransactionsByCustomerId(
-        customerId
-      );
+      const transactions = await TransactionAction.getTransactionsByCustomerId(customerId);
       res.status(200).json(transactions);
     } catch (error) {
       next(error);
     }
   };
 
-  public updateTransactionByIdController = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
+  public updateTransactionByIdController = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const transactionId = parseInt(req.params.id);
-      const { totalAmount, paymentStatus } = req.body;
-
-      const updatedTransaction = await transactionAction.updateTransactionById(
-        transactionId,
-        totalAmount,
-        paymentStatus
-      );
-
+      const { finalAmount, paymentStatus } = req.body;
+      const updatedTransaction = await TransactionAction.updateTransactionById(transactionId, finalAmount, paymentStatus);
       res.status(200).json({
         message: 'Transaction updated successfully',
         data: updatedTransaction,
@@ -97,16 +59,10 @@ export class TransactionController {
     }
   };
 
-  public deleteTransactionByIdController = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
+  public deleteTransactionByIdController = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const transactionId = parseInt(req.params.id);
-      const deletedTransaction = await transactionAction.deleteTransactionById(
-        transactionId
-      );
+      const deletedTransaction = await TransactionAction.deleteTransactionById(transactionId);
       res.status(200).json({
         message: 'Transaction deleted successfully',
         data: deletedTransaction,
@@ -114,7 +70,7 @@ export class TransactionController {
     } catch (error) {
       next(error);
     }
-  };
+  }
 }
 
 export default new TransactionController();

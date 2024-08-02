@@ -1,3 +1,4 @@
+import { TicketStatus } from '@prisma/client';
 import prisma from '../prisma';
 
 class TicketAction {
@@ -6,7 +7,7 @@ class TicketAction {
     customerId: number,
     transactionId: number,
     price: number,
-    status: number
+    status: TicketStatus
   ) {
     try {
       const ticket = await prisma.ticket.create({
@@ -49,7 +50,7 @@ class TicketAction {
   public async updateTicketById(
     id: number,
     price: number,
-    status: number
+    status: TicketStatus
   ) {
     try {
       const ticket = await prisma.ticket.update({
