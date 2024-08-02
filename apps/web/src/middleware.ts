@@ -19,7 +19,7 @@ const expiryChecker = async (token: string) => {
   const decoded = await decodeToken(token);
   if (!decoded || !decoded.exp) return true;
 
-  return Date.now() >= decoded.exp * 1000;
+  return Date.now() >= decoded.exp * 1000 - 500000;
 };
 
 const decodeToken = async (token: string) => {
@@ -35,6 +35,7 @@ export async function middleware(request: NextRequest) {
   const REFRESH_TOKEN = request.cookies.get('refresh-token')?.value || '';
   const ACCESS_TOKEN = request.cookies.get('access-token')?.value || '';
   const response = NextResponse.next();
+
   let role = '';
 
   if ((!REFRESH_TOKEN && ACCESS_TOKEN) || (REFRESH_TOKEN && !ACCESS_TOKEN)) {

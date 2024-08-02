@@ -8,6 +8,8 @@ import express, {
   Router,
 } from 'express';
 import cors from 'cors';
+import { join } from 'path';
+import path = require('path');
 
 import { FRONTEND_URL, PORT } from './config';
 import { EventsRouter } from './routers/events.router';
@@ -42,6 +44,7 @@ export default class App {
     );
     this.app.use(json());
     this.app.use(urlencoded({ extended: true }));
+    this.app.use(express.static('public'));
   }
 
   private handleError(): void {
@@ -82,6 +85,16 @@ export default class App {
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
+    });
+
+    this.app.get('/avatar/:name', (req: Request, res: Response) => {
+      const imageName = req.params.name;
+      res.sendFile(path.join(__dirname, 'public/avatar', imageName));
+    });
+
+    this.app.get('/thumbnail/:name', (req: Request, res: Response) => {
+      const imageName = req.params.name;
+      res.sendFile(path.join(__dirname, 'public/thumbnail', imageName));
     });
 
     this.app.use('/api/events', eventsRouter.getRouter());

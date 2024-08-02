@@ -1,14 +1,14 @@
 import prisma from '../prisma';
 
 class PromotionAction {
-  public async createPromotion(
+  public createPromotionAction = async (
     eventId: number,
     code: string,
     discountAmount: number,
     usageLimit: number,
     validFrom: Date,
-    validTo: Date
-  ) {
+    validTo: Date,
+  ) => {
     try {
       const promotion = await prisma.promotion.create({
         data: {
@@ -24,7 +24,7 @@ class PromotionAction {
     } catch (error) {
       throw error;
     }
-  }
+  };
 
   public async getAllPromotions() {
     try {
@@ -48,32 +48,37 @@ class PromotionAction {
     }
   }
 
-  public async updatePromotionById(
-    id: number,
+  public updatePromotionAction = async (
+    promotionId: number,
     discountAmount: number,
     usageLimit: number,
     validFrom: Date,
-    validTo: Date
-  ) {
+    validTo: Date,
+  ) => {
     try {
+      let fields = {};
+
+      if (discountAmount) fields = { ...fields, discountAmount };
+      if (usageLimit) fields = { ...fields, usageLimit };
+      if (validFrom) fields = { ...fields, validFrom };
+      if (validTo) fields = { ...fields, validTo };
+
       const promotion = await prisma.promotion.update({
         where: {
-          id,
+          id: promotionId,
         },
         data: {
-          discountAmount,
-          usageLimit,
-          validFrom,
-          validTo,
+          ...fields,
         },
       });
+
       return promotion;
     } catch (error) {
       throw error;
     }
-  }
+  };
 
-  public async deletePromotionById(id: number) {
+  public deletePromotionAction = async (id: number) => {
     try {
       const promotion = await prisma.promotion.delete({
         where: {
@@ -84,7 +89,7 @@ class PromotionAction {
     } catch (error) {
       throw error;
     }
-  }
+  };
 }
 
 export default new PromotionAction();
